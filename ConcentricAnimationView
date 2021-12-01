@@ -1,0 +1,75 @@
+import SwiftUI
+
+/**
+ A simple View that wraps a view and returns an animation using that view that has multiple copies of the view growing larger over time.
+
+ This view automates a progressively expanding view that starts from a central point, and grows larger until it gets to the size of the frame, and then disappears.
+ ````
+ ConcentricAnimationView(7, withDuration: 0.1, ofSize: 250) {
+     Circle()
+         .strokeBorder(Color.blue, lineWidth: 5)
+ }
+ 
+ ConcentricAnimationView(3, ofSize: 250) {
+     Circle()
+         .strokeBorder(Color.blue, lineWidth: 5)
+ }
+
+ ConcentricAnimationView(3, withDuration: 10, ofSize: 120, withFade: true) {
+     Text("Hello, World!")
+         .font(.headline)
+         .bold()
+         .foregroundColor(.red)
+ }
+
+ ````
+ */
+
+struct ConcentricAnimationView<Content: View>: View {
+    let maxSize: CGFloat
+    let count: Int
+    let fade: Bool
+    let duration: Double
+    let content: Content
+
+    @State private var animate = false
+    
+    var scaleFactor: CGFloat {
+        CGFloat(1) / CGFloat(count)
+    }
+
+    
+    /// This is the initalizer for ConcentricAnimationView
+    /// - Parameters:
+    ///   - count: This is the number of copies the animation will make.
+    ///   - withDuration: This is an optional value. If left nil, count will also be used for the duration.
+    ///   - ofSize: This sets the .frame() of the animation. It will always return a square.
+    ///   - withFade: This sets whether the view fades as it gets larger. The default is true.
+    ///   - content: This is the Content to be animated. It can be any View.
+    init(_ count: Int, withDuration: Double? = nil, ofSize: CGFloat, withFade: Bool = true, @ViewBuilder content: () -> Content) {
+        self.count = count
+        self.maxSize = ofSize
+        self.fade = withFade
+        if let withDuration = withDuration {
+            duration = withDuration
+        } else {
+            duration = Double(count)
+        }
+        self.content = content()
+    }
+    var body: some View {
+        ZStack {
+            ForEach(0..<count) {
+                content
+                    .opacity(fade ? (animate ? CGFloat(1) - ((CGFloat($0 + 1) * scaleFactor)) : CGFloat(1) - ((CGFloat($0) * scaleFactor))) : 1)
+                    .scaleEffect(animate ? (CGFloat($0 + 1) * scaleFactor) : CGFloat($0) * scaleFactor)
+            }
+            .frame(width: maxSize, height: maxSize)
+        }
+        .onAppear {
+            withAnimation(.linear(duration: duration).repeatForever(autoreverses: false)) {
+                animate = true
+            }
+        }
+    }
+}
