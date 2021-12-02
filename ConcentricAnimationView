@@ -39,7 +39,7 @@ struct ConcentricAnimationView<Content: View>: View {
     }
 
     
-    /// This is the initalizer for ConcentricAnimationView
+    /// This is the initializer for ConcentricAnimationView
     /// - Parameters:
     ///   - count: This is the number of copies the animation will make.
     ///   - withDuration: This is an optional value. If left nil, count will also be used for the duration.
