@@ -27,7 +27,7 @@ struct ConcentricTextAnimationView<Content: View>: View {
     ///   - ofSize: This sets the .frame() of the animation. It will always return a square.
     ///   - withFade: This sets whether the view fades as it gets larger. The default is true.
     ///   - content: This is the Content to be animated. It can be any View.
-    init(_ count: Int, withDuration: Double? = nil, maxFontSize: Int, ofFrameSize: CGFloat, withFade: Bool = true, @ViewBuilder content: () -> Content) {
+    init(_ count: Int, withDuration: Double? = nil, maxFontSize: Int, ofFrameSize: CGFloat, withFade: Bool = true, @ViewBuilder content: () -> Content) where Content == Text {
         self.count = count
         self.maxFrameSize = ofFrameSize
         self.maxFontSize = CGFloat(maxFontSize)
