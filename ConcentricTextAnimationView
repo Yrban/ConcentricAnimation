@@ -1,0 +1,57 @@
+import SwiftUI
+
+struct ConcentricTextAnimationView<Content: View>: View {
+    let maxFrameSize: CGFloat
+    let maxFontSize: CGFloat
+    let count: Int
+    let fade: Bool
+    let duration: Double
+    let content: Content
+
+    @State private var animate = false
+    
+    var scaleFactor: CGFloat {
+        CGFloat(1) / CGFloat(count) * maxFontSize
+    }
+
+    var opacityFactor: CGFloat {
+        CGFloat(1) / CGFloat(count)
+    }
+
+
+    /// This is the initaliizer for ConcentricAnimationView
+    /// - Parameters:
+    ///   - count: This is the number of copies the animation will make.
+    ///   - withDuration: This is an optional value. If left nil, count will also be used for the duration.
+    ///   - maxFontSize: This represents the maximum font size for the text being animated.
+    ///   - ofSize: This sets the .frame() of the animation. It will always return a square.
+    ///   - withFade: This sets whether the view fades as it gets larger. The default is true.
+    ///   - content: This is the Content to be animated. It can be any View.
+    init(_ count: Int, withDuration: Double? = nil, maxFontSize: Int, ofFrameSize: CGFloat, withFade: Bool = true, @ViewBuilder content: () -> Content) {
+        self.count = count
+        self.maxFrameSize = ofFrameSize
+        self.maxFontSize = CGFloat(maxFontSize)
+        self.fade = withFade
+        if let withDuration = withDuration {
+            duration = withDuration
+        } else {
+            duration = Double(count)
+        }
+        self.content = content()
+    }
+    var body: some View {
+        ZStack {
+            ForEach(0..<count) {
+                content
+                    .animateFont(size: animate ? (CGFloat($0 + 1) * scaleFactor) : CGFloat($0) * scaleFactor)
+                    .opacity(fade ? (animate ? CGFloat(1) - ((CGFloat($0 + 1) * opacityFactor)) : CGFloat(1) - ((CGFloat($0) * opacityFactor))) : 1)
+            }
+            .frame(width: maxFrameSize, height: maxFrameSize)
+        }
+        .onAppear {
+            withAnimation(.linear(duration: duration).repeatForever(autoreverses: false)) {
+                animate = true
+            }
+        }
+    }
+}
