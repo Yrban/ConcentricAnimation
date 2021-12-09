@@ -67,8 +67,11 @@ struct ConcentricAnimationView<Content: View>: View {
             .frame(width: maxSize, height: maxSize)
         }
         .onAppear {
-            withAnimation(.linear(duration: duration).repeatForever(autoreverses: false)) {
-                animate = true
+            // Wrapping the code in a DispatchQueue prevents an interaction with a NavigationView
+            DispatchQueue.main.async {
+                withAnimation(.linear(duration: duration).repeatForever(autoreverses: false)) {
+                    animate = true
+                }
             }
         }
     }
